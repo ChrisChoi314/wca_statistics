@@ -21,3 +21,4 @@ with open("data/WCA_export189_20230708T100008Z.tsv/WCA_export_Persons.tsv", "r",
 with open('data/data_num_ppl_per_country.json', 'w') as f:
     f.write(json.dumps(data))
     f.write('\n')
+
