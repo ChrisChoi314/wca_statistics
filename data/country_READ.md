@@ -1,0 +1,7 @@
+Breakdown for the data is: [Country name (str), Est. 2010 percent that is Christian (float), Est. 2010 percent that is Muslim (float), Est. 2010 percent that is Unaffiliated (float), Est. 2010 percent that is Hindu (float), Est. 2010 percent that is Buddhist (float), Est. 2010 percent that is Folk Religions* (float), Est. 2010 percent that is Other Religions** (float), Est. 2010 percent that is Jewish (float)]
+
+*Folk religions include followers of African traditional religions, Chinese folk religions, Native American religions and Australian aboriginal religions.
+
+**The “other religions” category includes Bahai’s, Jains, Sikhs, Shintoists, Taoists, followers of Tenrikyo, Wiccans, Zoroastrians and many other faiths. Population estimates of 9,999 persons or less are identified as “<10,000.” All other counts are rounded to the nearest 10,000. Percentages are calculated from unrounded numbers. Figures may not add exactly due to rounding. Estimated 2010 total population figures are based primarily on the 2010 revision of the United Nations World Population Prospects data. The United Nations provided the Pew Forum with special estimates for Sudan and the new nation of South Sudan. The population estimate for Kosovo is based on the figure from the World Religion Database, which is deducted from the U.N.’s Serbia estimate.
+
+Additionally, all values that are .1 are actually <.1%, but we truncated it to 0.1 because even if we do that, it's a total worse case inaccuracy of 0.7%, which is negligable for most countries.  
