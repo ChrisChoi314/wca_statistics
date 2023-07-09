@@ -18,14 +18,14 @@ for i in range(1, 9):
     for j in range(0, 10):
         max_val = max(data[i])
         max_idx = data[i].index(max_val)
-        tables[i-1].append([data[0][max_idx], max_val, round(100*max_val/data1['incidence'][data1['country'].index(data[0][max_idx])])])
+        tables[i-1].append([j+1, data[0][max_idx], max_val, round(100*max_val/data1['incidence'][data1['country'].index(data[0][max_idx])])])
         del data[i][max_idx]
         del data[0][max_idx]
     data[0] = copy.deepcopy(countries)
 
 
 # create header
-head = ['Country', 'Number of Cubers', 'Percent of Population']
+head = ['Rank', 'Country', 'Number of Cubers', 'Percent of Population']
 
 # display tables
 print('Countries with most Christian Cubers (Top 10)')
