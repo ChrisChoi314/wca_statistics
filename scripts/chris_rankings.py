@@ -4,10 +4,19 @@ from tabulate import tabulate
 
 names = ['Chris', 'Christian', 'Christopher', 'Kris', 'Kristopher']
 #names = ['Chris']
-names = ['Park', 'Bak', 'Pak']
 names = ['Christian']
-names = ['Choi', 'Chey', 'Choe', 'Choy', 'Chwe', 'Che']
+names = ['Park', 'Bak', 'Pak']
 names = ['Fan']
+# names = ['Choi', 'Chey', 'Choe', 'Choy', 'Chwe', 'Che',]# 'Cho', 'Sho', 'Qoi', 'Qoy', 'Qo', 'Qhey', 'Qu', 'Qoy', 'Oy', 'Oi', 'Ci', 'Cy', 'Hy', 'Hoi', 'Hui', 'Xo', 'Xoi', 'Xi', 'X', 'C', 'Ch', 'Q', 'Quan', 'Chung', 'Chong', 'Chang']
+names = ['Choi']
+names = ['Antu', 'Anta']
+names = ['Mahesh', 'Magesh']
+names = ['Mageshwaran']
+names = ['Aaron', 'Aron']
+names = ['Alex', 'Alexander', 'Alexey', 'Alexei']
+names = ['Parker']
+names = ['Wang']
+names = ['Max', 'Maks', 'Maximillian']
 events_to_ignore = ['333mbo', '333ft', 'magic', 'mmagic']
 
 with open("data/WCA_export189_20230708T100008Z.tsv/WCA_export_Persons.tsv", "r", encoding="utf8") as text:
@@ -18,13 +27,17 @@ with open("data/WCA_export189_20230708T100008Z.tsv/WCA_export_Persons.tsv", "r",
 
     for row in tsv_reader:
         (subid, name, countryID, gender, id) = row
-        first_name = name.split(' ')[0]
-        last_name = name.split(' ')[-1]
-        #if first_name in names:
+        effective_name = name
+        if ' (' in name:
+            effective_name = name[:name.find(' (')]
+        first_name = effective_name.split(' ')[0]
+        last_name = effective_name.split(' ')[-1]
+        if first_name in names:
             #chris_ids[0].append(id)
             #chris_ids[1].append(name)
+        # if first_name[:4] in names:
         #if last_name in names or first_name in names:
-        if last_name in names:
+        #if last_name in names:
             chris_ids[0].append(id)
             chris_ids[1].append(name)
 
@@ -60,6 +73,6 @@ for j in range(len(data2[0])):
                 event_rankings = [j + 1, data2[1][j], f'{chris_ids[1][chris_ids[0].index(data1[0][i])]} - {data1[0][i]}', ranking]
     table += [event_rankings]
 print(table)
-head = ['#', 'Event', 'Fan', 'Rank']
+head = ['#', 'Event', 'Generalized Max', 'Rank']
 
 print(tabulate(table, headers=head, tablefmt="grid"))
