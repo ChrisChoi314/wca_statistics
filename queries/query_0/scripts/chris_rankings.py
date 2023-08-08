@@ -17,6 +17,7 @@ names = ['Alex', 'Alexander', 'Alexey', 'Alexei']
 names = ['Parker']
 names = ['Wang']
 names = ['Max', 'Maks', 'Maximillian']
+names = ['Donna']
 events_to_ignore = ['333mbo', '333ft', 'magic', 'mmagic']
 
 with open("data/WCA_export189_20230708T100008Z.tsv/WCA_export_Persons.tsv", "r", encoding="utf8") as text:
@@ -73,6 +74,6 @@ for j in range(len(data2[0])):
                 event_rankings = [j + 1, data2[1][j], f'{chris_ids[1][chris_ids[0].index(data1[0][i])]} - {data1[0][i]}', ranking]
     table += [event_rankings]
 print(table)
-head = ['#', 'Event', 'Generalized Max', 'Rank']
+head = ['#', 'Event', 'Donna', 'Rank']
 
 print(tabulate(table, headers=head, tablefmt="grid"))
