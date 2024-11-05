@@ -95,6 +95,5 @@ sns.heatmap(corrmat,xticklabels=True, yticklabels=True, annot=True, fmt=".2f",  
 plt.xticks(rotation=90)  # Make x-axis labels vertical
 plt.yticks(rotation=0)    # Make y-axis labels horizontal
 plt.title(f'Event Percentile Rank Correlction + FTO Heat Map (n = {len(Results["personId"].unique() )})')
+plt.savefig("queries/correlation_fto_wca/correlate_figs/fig1.pdf")
 plt.show()
-plt.savefig("queries/correlation_fto_wca/correlate_figs/fig0.pdf")
-plt.close()
