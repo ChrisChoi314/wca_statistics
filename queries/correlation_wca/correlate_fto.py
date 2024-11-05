@@ -3,6 +3,7 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 from scipy.stats import rankdata
+from scipy.stats import pearsonr
 
 # Load WCA data
 Results = pd.read_csv('data/WCA_export309_20241104T002532Z.tsv/WCA_export_RanksSingle.tsv', sep='\t')
@@ -64,16 +65,26 @@ events_participation = Results.pivot_table(index=['personId'],
 # Calculate correlation matrix
 corrmat = events_participation.corr(method='pearson')
 
-# Plot the heatmap with correlation percentages
+# Create an empty dataframe to store the p-values
+p_values = pd.DataFrame(index=corrmat.index, columns=corrmat.columns).astype(float)
+for col1 in corrmat.columns:
+    for col2 in corrmat.columns:
+        corr, p_value = pearsonr(events_participation[col1], events_participation[col2])
+        p_values.at[col1, col2] = p_value
 
 plt.figure(figsize=(15, 12))
 sns.mpl_palette("magma", 6)
-sns.heatmap(corrmat,xticklabels=True, yticklabels=True, annot=True, fmt=".2f",  # Show percentages
-            annot_kws={"size": 8}, linewidths=.5, linecolor='gray')
+#sns.heatmap(p_values,xticklabels=True, yticklabels=True, annot=True, fmt=".3f", annot_kws={"size": 8}, linewidths=.5, linecolor='gray')
+sns.heatmap(corrmat,xticklabels=True, yticklabels=True, annot=True, fmt=".3f", annot_kws={"size": 8}, linewidths=.5, linecolor='gray')
+
+print("Correlation Matrix:")
+print(corrmat.dtypes)   
+print("\nP-value Matrix:")
+print(p_values.dtypes)
 
 # Rotate the labels
 plt.xticks(rotation=90)  # Make x-axis labels vertical
 plt.yticks(rotation=0)    # Make y-axis labels horizontal
-plt.title(f'Event Percentile Rank Correlation + FTO Heat Map (n = {len(Results["personId"].unique())})')
-plt.savefig("queries/correlation_wca/correlate_figs/correlation_fto.pdf")
+plt.title(f'Event Percentile Rank Correlation + FTO P-Values Heat Map (n = {len(Results["personId"].unique())})')
+plt.savefig("queries/correlation_wca/correlate_figs/correlation_fto_3_dec.pdf")
 plt.show()
