@@ -6,10 +6,13 @@ from scipy.stats import rankdata
 from scipy.stats import pearsonr
 
 # Load WCA data
-Results = pd.read_csv('data/WCA_export309_20241104T002532Z.tsv/WCA_export_RanksSingle.tsv', sep='\t')
+temp_string = 'WCA_export_2025-04-01'
+# old string, WCA_export309_20241104T002532Z.tsv
+
+Results = pd.read_csv('data/' + temp_string + '/WCA_export_RanksSingle.tsv', sep='\t')
 
 # Load WCA persons data
-Persons = pd.read_csv('data/WCA_export309_20241104T002532Z.tsv/WCA_export_Persons.tsv', sep='\t')
+Persons = pd.read_csv('data/' + temp_string + '/WCA_export_Persons.tsv', sep='\t')
 
 # Load fto rankings data and add it to the WCA results
 fto_results = pd.read_csv('queries/correlation_wca/fto_rankings.tsv', sep='\t')
@@ -86,5 +89,5 @@ print(p_values.dtypes)
 plt.xticks(rotation=90)  # Make x-axis labels vertical
 plt.yticks(rotation=0)    # Make y-axis labels horizontal
 plt.title(f'Event Percentile Rank Correlation + FTO P-Values Heat Map (n = {len(Results["personId"].unique())})')
-plt.savefig("queries/correlation_wca/correlate_figs/correlation_fto_3_dec.pdf")
+plt.savefig("queries/correlation_wca/correlate_figs/correlation_fto_2025-04-01.pdf")
 plt.show()

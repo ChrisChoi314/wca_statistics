@@ -2,3 +2,5 @@
 *.tsv
 
 !data/countries.json
+!queries/correlation_wca/fto_rankings.tsv
+
