@@ -1,6 +1,9 @@
 *.json
 *.tsv
+.DS_Store
+data/*
 
 !data/countries.json
 !queries/correlation_wca/fto_rankings.tsv
-
+!data/WCA_export_2025-04-01/
+!data/WCA_export_2025-04-01/README.md

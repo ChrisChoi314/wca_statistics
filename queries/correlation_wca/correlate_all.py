@@ -1,58 +1,83 @@
-import pandas as pd
-import numpy as np
-import seaborn as sns
+import os
+from pathlib import Path
+
+os.environ.setdefault("MPLCONFIGDIR", "/tmp/matplotlib")
+
+import matplotlib
+
+matplotlib.use("Agg")
+
 import matplotlib.pyplot as plt
-from scipy.stats import rankdata
-from scipy.stats import pearsonr
+import numpy as np
 
-# Load WCA data
-Results = pd.read_csv('data/WCA_export309_20241104T002532Z.tsv/WCA_export_RanksSingle.tsv', sep='\t')
-
-# Load WCA persons data
-Persons = pd.read_csv('data/WCA_export309_20241104T002532Z.tsv/WCA_export_Persons.tsv', sep='\t')
-
-Results = Results[['personId', 'eventId', 'worldRank']]  # Assuming 'result' column has the results
-
-# Remove duplicate entries based on personId, competitionId, and eventId
-Results = Results.drop_duplicates(subset=['personId',  'eventId'])
-
-# Standardize eventId to ensure all values are strings
-Results['eventId'] = Results['eventId'].astype(str)
-
-# Filter out the specific events to exclude from analysis
-excluded_events = ['333mbo', 'magic', 'mmagic', '333ft']
-Results = Results[~Results['eventId'].isin(excluded_events)]
-
-# Calculate percentile ranks for each event
-Results['percentile_rank'] = Results.groupby('eventId')['worldRank'].transform(
-    lambda x: 100 - rankdata(x, method='average') / len(x) * 100
+from correlation_data import (
+    FIGURES_DIR,
+    calculate_percentile_correlation,
+    latest_wca_export_dir,
+    load_wca_single_ranks,
 )
 
-# Reshape data for correlation matrix
-events_participation = Results.pivot_table(index=['personId'], 
-                                           columns='eventId', 
-                                           values='percentile_rank', 
-                                           fill_value=0)
 
-# Calculate correlation matrix
-corrmat = events_participation.corr(method='pearson')
+def save_heatmap(matrix: np.ndarray, labels: list[str], output_path: Path, title: str) -> None:
+    fig, ax = plt.subplots(figsize=(17, 14))
+    vmin = float(np.nanmin(matrix))
+    vmax = float(np.nanmax(matrix))
+    cmap = plt.get_cmap("magma")
+    image = ax.imshow(matrix, cmap=cmap, vmin=vmin, vmax=vmax)
+    colorbar = fig.colorbar(image, ax=ax, fraction=0.046, pad=0.04)
+    colorbar.ax.tick_params(labelsize=11)
 
-# Create an empty dataframe to store the p-values
-p_values = pd.DataFrame(index=corrmat.index, columns=corrmat.columns).astype(float)
-for col1 in corrmat.columns:
-    for col2 in corrmat.columns:
-        corr, p_value = pearsonr(events_participation[col1], events_participation[col2])
-        p_values.at[col1, col2] = p_value
-        
+    ax.set_xticks(np.arange(len(labels)), labels=labels, rotation=90, fontsize=12)
+    ax.set_yticks(np.arange(len(labels)), labels=labels, fontsize=12)
+    ax.set_title(title, fontsize=16, pad=16)
 
-plt.figure(figsize=(15, 12))
-sns.mpl_palette("magma", 6)
-sns.heatmap(p_values,xticklabels=True, yticklabels=True, annot=True, fmt=".3f", annot_kws={"size": 8}, linewidths=.5, linecolor='gray')
-#sns.heatmap(corrmat,xticklabels=True, yticklabels=True, annot=True, fmt=".2f", annot_kws={"size": 8}, linewidths=.5, linecolor='gray')
+    for row_index in range(matrix.shape[0]):
+        for col_index in range(matrix.shape[1]):
+            value = matrix[row_index, col_index]
+            normalized = 0.5 if vmax == vmin else (value - vmin) / (vmax - vmin)
+            red, green, blue, _ = cmap(normalized)
+            luminance = 0.2126 * red + 0.7152 * green + 0.0722 * blue
+            ax.text(
+                col_index,
+                row_index,
+                f"{value:.3f}",
+                ha="center",
+                va="center",
+                color="black" if luminance > 0.55 else "white",
+                fontsize=10,
+            )
 
-# Rotate the labels
-plt.xticks(rotation=90)  # Make x-axis labels vertical
-plt.yticks(rotation=0)    # Make y-axis labels horizontal
-plt.title(f'WCA Event Percentile Rank Correlation P-Values Heat Map (n = {len(Results["personId"].unique())})')
-plt.savefig("queries/correlation_wca/correlate_figs/correlation_all_p_values.pdf")
-plt.show()
+    ax.set_xticks(np.arange(matrix.shape[1] + 1) - 0.5, minor=True)
+    ax.set_yticks(np.arange(matrix.shape[0] + 1) - 0.5, minor=True)
+    ax.grid(which="minor", color="gray", linestyle="-", linewidth=0.5)
+    ax.tick_params(which="minor", bottom=False, left=False)
+    fig.tight_layout()
+    fig.savefig(output_path)
+    fig.savefig(output_path.with_suffix(".png"), dpi=300)
+    plt.close(fig)
+
+
+def print_matrix(labels: list[str], matrix: np.ndarray) -> None:
+    print("\t" + "\t".join(labels))
+    for label, row in zip(labels, matrix):
+        print(label + "\t" + "\t".join(f"{value:.6f}" for value in row))
+
+
+def main() -> None:
+    wca_export_dir = latest_wca_export_dir()
+    results = load_wca_single_ranks(wca_export_dir)
+
+    labels, people, corrmat, _ = calculate_percentile_correlation(results)
+
+    FIGURES_DIR.mkdir(parents=True, exist_ok=True)
+    title = f"WCA Event Percentile Rank Correlation (n = {len(people)})"
+    save_heatmap(corrmat, labels, FIGURES_DIR / "correlation_all.pdf", title)
+
+    print(f"Loaded WCA export: {wca_export_dir}")
+    print(f"People in correlation matrix: {len(people)}")
+    print("Correlation Matrix:")
+    print_matrix(labels, corrmat)
+
+
+if __name__ == "__main__":
+    main()
